@@ -1,0 +1,46 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "ulfom"
+version = "0.1.0"
+description = "Python client library for the Ulfom API"
+authors = ["Dipankar Sarkar <me@dipankar.name>"]
+readme = "README.md"
+packages = [{include = "ulfom_client"}]
+license = "MIT"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = ["ulfom", "api", "client"]
+repository = "https://github.com/ulfom/ulfom-python"
+documentation = "https://github.com/ulfom/ulfom-python#readme"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "^2.31.0"
+aiohttp = "^3.9.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.1"
+pytest-cov = "^4.1.0"
+black = "^23.7.0"
+isort = "^5.12.0"
+mypy = "^1.5.1"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3 
