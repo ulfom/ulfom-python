@@ -1,6 +1,6 @@
 import pytest
 import aiohttp
-from ulfom_client import AsyncUlfomClient
+from ulfom import AsyncUlfomClient
 
 @pytest.mark.asyncio
 async def test_async_client_initialization(async_client):

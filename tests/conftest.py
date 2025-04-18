@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 import aiohttp
 import requests
-from ulfom_client import UlfomClient, AsyncUlfomClient
+from ulfom import UlfomClient, AsyncUlfomClient
 
 @pytest.fixture
 def mock_response():

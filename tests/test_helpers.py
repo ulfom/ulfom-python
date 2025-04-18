@@ -1,6 +1,6 @@
 import pytest
-from ulfom_client import UlfomClient, URLHelper, TaskHelper, ServiceHelper
-from ulfom_client import AsyncUlfomClient, AsyncURLHelper, AsyncTaskHelper, AsyncServiceHelper
+from ulfom import UlfomClient, URLHelper, TaskHelper, ServiceHelper
+from ulfom import AsyncUlfomClient, AsyncURLHelper, AsyncTaskHelper, AsyncServiceHelper
 
 def test_url_helper(client):
     url_helper = URLHelper(client)

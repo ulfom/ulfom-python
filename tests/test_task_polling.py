@@ -1,8 +1,8 @@
 import pytest
 import time
 from unittest.mock import Mock, patch
-from ulfom_client import UlfomClient, TaskHelper
-from ulfom_client import AsyncUlfomClient, AsyncTaskHelper
+from ulfom import UlfomClient, TaskHelper
+from ulfom import AsyncUlfomClient, AsyncTaskHelper
 
 def test_task_polling_success(client):
     # Mock responses for task status checks

@@ -19,7 +19,7 @@ pip install ulfom
 #### Synchronous Client
 
 ```python
-from ulfom_client import UlfomClient
+from ulfom import UlfomClient
 
 # Initialize the client
 client = UlfomClient(
@@ -35,7 +35,7 @@ data = client.post("/endpoint", json={"key": "value"})
 #### Asynchronous Client
 
 ```python
-from ulfom_client import AsyncUlfomClient
+from ulfom import AsyncUlfomClient
 
 async def main():
     # Initialize the client
@@ -59,7 +59,7 @@ The library provides helper classes to make common operations easier:
 #### URL Processing
 
 ```python
-from ulfom_client import UlfomClient, URLHelper
+from ulfom import UlfomClient, URLHelper
 
 client = UlfomClient(base_url="https://www.ulfom.com/api/v1", api_key="your-api-key")
 url_helper = URLHelper(client)
@@ -74,7 +74,7 @@ content = url_helper.get_by_hash(service="extractor", domain="example.com", hash
 #### Task Management
 
 ```python
-from ulfom_client import UlfomClient, TaskHelper
+from ulfom import UlfomClient, TaskHelper
 
 # Initialize task helper with custom polling settings
 task_helper = TaskHelper(
@@ -119,7 +119,7 @@ except Exception as e:
 #### Service Discovery
 
 ```python
-from ulfom_client import UlfomClient, ServiceHelper
+from ulfom import UlfomClient, ServiceHelper
 
 client = UlfomClient(base_url="https://www.ulfom.com/api/v1", api_key="your-api-key")
 service_helper = ServiceHelper(client)
@@ -132,7 +132,7 @@ task_services = service_helper.list_task_services()
 ### Async Helper Classes
 
 ```python
-from ulfom_client import AsyncUlfomClient, AsyncURLHelper, AsyncTaskHelper, AsyncServiceHelper
+from ulfom import AsyncUlfomClient, AsyncURLHelper, AsyncTaskHelper, AsyncServiceHelper
 
 async def main():
     async with AsyncUlfomClient(
@@ -162,7 +162,7 @@ asyncio.run(main())
 The async task helper provides convenient methods for waiting for task completion:
 
 ```python
-from ulfom_client import AsyncUlfomClient, AsyncTaskHelper
+from ulfom import AsyncUlfomClient, AsyncTaskHelper
 
 async def main():
     async with AsyncUlfomClient(

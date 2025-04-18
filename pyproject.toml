@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Python client library for the Ulfom API"
 authors = ["Dipankar Sarkar <me@dipankar.name>"]
 readme = "README.md"
-packages = [{include = "ulfom_client"}]
+packages = [{include = "ulfom"}]
 license = "MIT"
 classifiers = [
     "Development Status :: 4 - Beta",

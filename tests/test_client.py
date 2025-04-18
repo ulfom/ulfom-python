@@ -1,5 +1,5 @@
 import pytest
-from ulfom_client import UlfomClient
+from ulfom import UlfomClient
 
 def test_client_initialization(client):
     assert client.base_url == "https://www.ulfom.com/api/v1"
