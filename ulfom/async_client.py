@@ -24,7 +24,17 @@ class AsyncUlfomClient:
             api_key: Optional API key for authentication
             timeout: Request timeout in seconds
             session: Optional aiohttp.ClientSession instance
+            
+        Raises:
+            ValueError: If base_url is empty or invalid, or if api_key is empty
         """
+        if not base_url:
+            raise ValueError("base_url cannot be empty")
+        if not base_url.startswith(('http://', 'https://')):
+            raise ValueError("base_url must start with http:// or https://")
+        if api_key is not None and not api_key.strip():
+            raise ValueError("api_key cannot be empty")
+            
         self.base_url = base_url.rstrip('/')
         self.api_key = api_key
         self.timeout = aiohttp.ClientTimeout(total=timeout)
@@ -89,7 +99,7 @@ class AsyncUlfomClient:
         
         async with self.session.request(
             method=method,
-            url=url,
+            url=self.base_url + endpoint,
             params=params,
             json=json,
             **kwargs

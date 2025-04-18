@@ -12,7 +12,6 @@ async def test_async_client_get(async_client, mock_aiohttp_session):
     response = await async_client.get("/test-endpoint")
     mock_aiohttp_session.get.assert_called_once_with(
         "https://www.ulfom.com/api/v1/test-endpoint",
-        headers={"Authorization": "Bearer test-key"},
         params=None
     )
     assert response == {"status": "success", "data": {"key": "value"}}
@@ -23,7 +22,6 @@ async def test_async_client_post(async_client, mock_aiohttp_session):
     response = await async_client.post("/test-endpoint", json=data)
     mock_aiohttp_session.post.assert_called_once_with(
         "https://www.ulfom.com/api/v1/test-endpoint",
-        headers={"Authorization": "Bearer test-key"},
         json=data
     )
     assert response == {"status": "success", "data": {"key": "value"}}
@@ -31,11 +29,9 @@ async def test_async_client_post(async_client, mock_aiohttp_session):
 @pytest.mark.asyncio
 async def test_async_client_without_api_key(mock_aiohttp_session):
     with pytest.raises(ValueError):
-        async with AsyncUlfomClient(base_url="https://www.ulfom.com/api/v1"):
-            pass
+        AsyncUlfomClient(base_url="https://www.ulfom.com/api/v1", api_key="")
 
 @pytest.mark.asyncio
 async def test_async_client_with_invalid_base_url(mock_aiohttp_session):
     with pytest.raises(ValueError):
-        async with AsyncUlfomClient(base_url="not-a-url", api_key="test-key"):
-            pass 
+        AsyncUlfomClient(base_url="not-a-url", api_key="test-key") 

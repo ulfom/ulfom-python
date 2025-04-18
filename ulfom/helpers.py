@@ -237,6 +237,7 @@ class AsyncTaskHelper:
             The final task result
         """
         task = await self.create_task(service, url, parameters)
+        print(f"Task created: {task}")
         return await self.wait_for_task(
             service,
             task["task_id"],

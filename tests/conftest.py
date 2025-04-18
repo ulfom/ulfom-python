@@ -14,6 +14,7 @@ def mock_response():
 @pytest.fixture
 def mock_session(mock_response):
     session = Mock(spec=requests.Session)
+    session.headers = {}
     session.get.return_value = mock_response
     session.post.return_value = mock_response
     return session
@@ -30,12 +31,15 @@ async def mock_aiohttp_session():
     mock_response = Mock()
     mock_response.json = Mock(return_value={"status": "success", "data": {"key": "value"}})
     mock_response.status = 200
-    session.get.return_value.__aenter__.return_value = mock_response
-    session.post.return_value.__aenter__.return_value = mock_response
+    mock_response.__aenter__ = Mock(return_value=mock_response)
+    mock_response.__aexit__ = Mock(return_value=None)
+    session.get.return_value = mock_response
+    session.post.return_value = mock_response
     return session
 
 @pytest.fixture
 async def async_client(mock_aiohttp_session):
     with patch('aiohttp.ClientSession', return_value=mock_aiohttp_session):
-        async with AsyncUlfomClient(base_url="https://www.ulfom.com/api/v1", api_key="test-key") as client:
-            yield client 
+        client = AsyncUlfomClient(base_url="https://www.ulfom.com/api/v1", api_key="test-key")
+        yield client
+        await client.close() 
