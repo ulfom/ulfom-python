@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -37,6 +41,4 @@ jobs:
       run: poetry build
       
     - name: Publish to PyPI
-      env:
-        PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-      run: poetry publish --username __token__ --password $PYPI_API_TOKEN 
+      uses: pypa/gh-action-pypi-publish@release/v1 
