@@ -200,9 +200,11 @@ class AsyncTaskHelper:
         start_time = asyncio.get_event_loop().time()
         
         while True:
+            await asyncio.sleep(poll_interval)
+
             status = await self.get_task_status(service, task_id)
-            
-            if status["status"] == "completed":
+                        
+            if status["status"] == "complete":
                 return status
             elif status["status"] == "failed":
                 raise Exception(f"Task failed: {status.get('error', 'Unknown error')}")
@@ -212,9 +214,7 @@ class AsyncTaskHelper:
                 elapsed = asyncio.get_event_loop().time() - start_time
                 if elapsed >= timeout:
                     raise asyncio.TimeoutError(f"Task did not complete within {timeout} seconds")
-            
-            await asyncio.sleep(poll_interval)
-    
+                
     async def create_and_wait(
         self,
         service: str,

@@ -4,8 +4,8 @@ from ulfom import AsyncUlfomClient, AsyncURLHelper, AsyncTaskHelper, AsyncServic
 async def main():
     # Initialize the async client
     async with AsyncUlfomClient(
-        base_url="https://www.ulfom.com/api/v1",
-        api_key="your-api-key"  # Replace with your actual API key
+        base_url="http://localhost:8000/api/v1",
+        api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidHlwZSI6ImFjY2Vzc190b2tlbiIsImlhdCI6MTc0NTgzMjUzOSwiZXhwIjoxNzQ4NDI0NTM5fQ.UsMt6VR0f_gjxKjXohtSB1938xmAaap-zG_wk_H9MC4"
     ) as client:
         # Initialize helpers
         url_helper = AsyncURLHelper(client)
@@ -15,10 +15,10 @@ async def main():
         try:
             # List available services
             print("Fetching available services...")
-            #url_services = await service_helper.list_url_services()
-            #task_services = await service_helper.list_task_services()
-            #print(f"URL Services: {url_services}")
-            #print(f"Task Services: {task_services}")
+            url_services = await service_helper.list_url_services()
+            task_services = await service_helper.list_task_services()
+            print(f"URL Services: {url_services}")
+            print(f"Task Services: {task_services}")
 
             # Process a URL using the extractor service
             print("\nProcessing URL...")
