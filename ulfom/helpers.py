@@ -159,6 +159,7 @@ class AsyncTaskHelper:
         self.client = client
         self.poll_interval = poll_interval
         self.timeout = timeout
+        self._current_task = None
     
     async def create_task(self, service: str, url: str, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Create a new task"""
@@ -192,6 +193,7 @@ class AsyncTaskHelper:
             
         Raises:
             asyncio.TimeoutError: If the task doesn't complete within the timeout
+            asyncio.CancelledError: If the task is cancelled
             Exception: If the task fails
         """
         poll_interval = poll_interval or self.poll_interval
@@ -199,21 +201,41 @@ class AsyncTaskHelper:
         
         start_time = asyncio.get_event_loop().time()
         
-        while True:
-            await asyncio.sleep(poll_interval)
+        try:
+            while True:
+                # Create a sleep task that can be cancelled
+                sleep_task = asyncio.create_task(asyncio.sleep(poll_interval))
+                self._current_task = sleep_task
+                
+                try:
+                    await sleep_task
+                except asyncio.CancelledError:
+                    # Clean up the sleep task
+                    if not sleep_task.done():
+                        sleep_task.cancel()
+                    raise
+                finally:
+                    self._current_task = None
 
-            status = await self.get_task_status(service, task_id)
-                        
-            if status["status"] == "complete":
-                return status
-            elif status["status"] == "failed":
-                raise Exception(f"Task failed: {status.get('error', 'Unknown error')}")
-            
-            # Check timeout
-            if timeout is not None:
-                elapsed = asyncio.get_event_loop().time() - start_time
-                if elapsed >= timeout:
-                    raise asyncio.TimeoutError(f"Task did not complete within {timeout} seconds")
+                status = await self.get_task_status(service, task_id)
+                            
+                if status["status"] == "complete":
+                    return status
+                elif status["status"] == "failed":
+                    raise Exception(f"Task failed: {status.get('error', 'Unknown error')}")
+                
+                # Check timeout
+                if timeout is not None:
+                    elapsed = asyncio.get_event_loop().time() - start_time
+                    if elapsed >= timeout:
+                        raise asyncio.TimeoutError(f"Task did not complete within {timeout} seconds")
+        except asyncio.CancelledError:
+            # Clean up any pending sleep task
+            if self._current_task and not self._current_task.done():
+                self._current_task.cancel()
+            raise
+        finally:
+            self._current_task = None
                 
     async def create_and_wait(
         self,
@@ -237,7 +259,6 @@ class AsyncTaskHelper:
             The final task result
         """
         task = await self.create_task(service, url, parameters)
-        print(f"Task created: {task}")
         return await self.wait_for_task(
             service,
             task["task_id"],

@@ -3,6 +3,7 @@ Asynchronous client for Ulfom API
 """
 
 import aiohttp
+import asyncio
 from typing import Optional, Dict, Any, Union
 from urllib.parse import urljoin
 
@@ -39,6 +40,7 @@ class AsyncUlfomClient:
         self.api_key = api_key
         self.timeout = aiohttp.ClientTimeout(total=timeout)
         self._session = session
+        self._loop = None
         
         # Set up headers
         self._headers = {
@@ -59,9 +61,28 @@ class AsyncUlfomClient:
         return self._session
     
     async def close(self) -> None:
-        """Close the session."""
+        """Close the session and cleanup resources."""
         if self._session and not self._session.closed:
             await self._session.close()
+        
+        # Get the current event loop
+        try:
+            self._loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # No running loop, nothing to clean up
+            return
+            
+        # Cancel all running tasks
+        tasks = [t for t in asyncio.all_tasks(self._loop) if t is not asyncio.current_task(self._loop)]
+        for task in tasks:
+            task.cancel()
+            
+        # Wait for all tasks to complete
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+            
+        # Stop the loop
+        self._loop.stop()
     
     async def __aenter__(self) -> 'AsyncUlfomClient':
         """Enter async context."""
