@@ -62,8 +62,12 @@ class AsyncUlfomClient:
     
     async def close(self) -> None:
         """Close the session and cleanup resources."""
-        if self._session and not self._session.closed:
-            await self._session.close()
+        try:
+            if self._session and not self._session.closed:
+                await self._session.close()
+        except Exception as e:
+            # Log or handle session close error
+            pass
         
         # Get the current event loop
         try:
@@ -72,17 +76,31 @@ class AsyncUlfomClient:
             # No running loop, nothing to clean up
             return
             
-        # Cancel all running tasks
-        tasks = [t for t in asyncio.all_tasks(self._loop) if t is not asyncio.current_task(self._loop)]
-        for task in tasks:
-            task.cancel()
+        try:
+            # Get all running tasks except the current one
+            tasks = [t for t in asyncio.all_tasks(self._loop) if t is not asyncio.current_task(self._loop)]
             
-        # Wait for all tasks to complete
-        if tasks:
-            await asyncio.gather(*tasks, return_exceptions=True)
+            # Cancel all tasks
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
             
-        # Stop the loop
-        self._loop.stop()
+            # Wait for all tasks to complete with a timeout
+            if tasks:
+                try:
+                    await asyncio.wait_for(
+                        asyncio.gather(*tasks, return_exceptions=True),
+                        timeout=1.0  # Add a reasonable timeout
+                    )
+                except asyncio.TimeoutError:
+                    # If tasks don't complete in time, log and continue
+                    pass
+        except Exception as e:
+            # Log or handle task cleanup error
+            pass
+        finally:
+            # Don't stop the loop - let the caller handle that
+            self._loop = None
     
     async def __aenter__(self) -> 'AsyncUlfomClient':
         """Enter async context."""

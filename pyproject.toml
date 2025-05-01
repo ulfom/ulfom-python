@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ulfom"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python client library for the Ulfom API"
 authors = ["Dipankar Sarkar <me@dipankar.name>"]
 readme = "README.md"

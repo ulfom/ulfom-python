@@ -217,7 +217,12 @@ class AsyncTaskHelper:
                 finally:
                     self._current_task = None
 
-                status = await self.get_task_status(service, task_id)
+                try:
+                    status = await self.get_task_status(service, task_id)
+                except Exception as e:
+                    # Ensure cleanup on any exception during status check
+                    self._current_task = None
+                    raise e
                             
                 if status["status"] == "complete":
                     return status
@@ -235,6 +240,7 @@ class AsyncTaskHelper:
                 self._current_task.cancel()
             raise
         finally:
+            # Ensure cleanup in all cases
             self._current_task = None
                 
     async def create_and_wait(
@@ -258,13 +264,27 @@ class AsyncTaskHelper:
         Returns:
             The final task result
         """
-        task = await self.create_task(service, url, parameters)
-        return await self.wait_for_task(
-            service,
-            task["task_id"],
-            poll_interval=poll_interval,
-            timeout=timeout
-        )
+        try:
+            task = await self.create_task(service, url, parameters)
+            return await self.wait_for_task(
+                service,
+                task["task_id"],
+                poll_interval=poll_interval,
+                timeout=timeout
+            )
+        except asyncio.CancelledError:
+            # Ensure cleanup on cancellation
+            if self._current_task and not self._current_task.done():
+                self._current_task.cancel()
+            raise
+        except Exception as e:
+            # Ensure cleanup on any other exception
+            if self._current_task and not self._current_task.done():
+                self._current_task.cancel()
+            raise e
+        finally:
+            # Final cleanup
+            self._current_task = None
 
 class AsyncServiceHelper:
     """Async helper class for service operations"""
